@@ -16,31 +16,20 @@ func IsDigit(digit rune) bool {
 }
 
 func Unpack(myStr string) (string, error) {
-	// Place your code here.
-
-	var previousRune string
 	var newString string
 
-	for i, v := range myStr {
+	runes := []rune(myStr)
+	for i := 0; i < len(runes); i++ {
 		switch {
-		case IsDigit(v) && i == 0:
+		case IsDigit(runes[i]) && i == 0:
 			return "error", ErrInvalidString
-		case IsDigit(v):
-			digit, err := strconv.Atoi(string(v))
+		case IsDigit(runes[i]):
+			digit, err := strconv.Atoi(string(runes[i]))
 			if err != nil {
 				return "", err
 			}
-			a := myStr[i-1]
-			b := "_"
-			if i >= 2 {
-				b = string(myStr[i-2])
-			}
-			if b == "\\" {
-				previousRune = b + string(a)
-			} else {
-				previousRune = string(a)
-			}
-			if IsDigit(rune(a)) {
+			previousRune := string(runes[i-1])
+			if IsDigit(runes[i-1]) {
 				return "error", ErrInvalidString
 			}
 			if digit == 0 {
@@ -49,10 +38,8 @@ func Unpack(myStr string) (string, error) {
 				newString += strings.Repeat(previousRune, digit-1)
 			}
 		default:
-			previousRune = string(myStr[i])
-			newString += previousRune
+			newString += string(runes[i])
 		}
 	}
-
 	return newString, nil
 }
