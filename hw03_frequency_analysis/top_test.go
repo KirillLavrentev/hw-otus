@@ -43,6 +43,20 @@ var text = `Как видите, он  спускается  по  лестни�
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
 
+var text1 = "abc abc abc bca bca a"
+
+var text2 = ""
+
+var text3 = "aa aa 123e3 sdgwef aa ergsdf aa 123e3"
+
+var text4 = `Each package fulfils a single purpose
+Handle errors explicitly
+Return early rather than nesting deeply.
+Leave concurrency to the caller
+Simplicity matters
+Maintainability counts
+`
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		require.Len(t, Top10(""), 0)
@@ -77,6 +91,38 @@ func TestTop10(t *testing.T) {
 				"то",        // 4
 			}
 			require.Equal(t, expected, Top10(text))
+
+			expected = []string{
+				"abc", // 3
+				"bca", // 2
+				"a",   // 1
+			}
+			require.Equal(t, expected, Top10(text1))
+
+			expected = []string{}
+			require.Equal(t, expected, Top10(text2))
+
+			expected = []string{
+				"aa",     // 4
+				"123e3",  // 2
+				"ergsdf", // 1
+				"sdgwef", // 1
+			}
+			require.Equal(t, expected, Top10(text3))
+
+			expected = []string{
+				"Each",            // 1
+				"Handle",          // 1
+				"Leave",           // 1
+				"Maintainability", // 1
+				"Return",          // 1
+				"Simplicity",      // 1
+				"a",               // 1
+				"caller",          // 1
+				"concurrency",     // 1
+				"counts",          // 1
+			}
+			require.Equal(t, expected, Top10(text4))
 		}
 	})
 }
