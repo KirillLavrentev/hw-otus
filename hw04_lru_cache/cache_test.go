@@ -50,8 +50,102 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		// Проверка на логику выталкивания элементов из-за размера очереди (например: n = 3, добавили 4 элемента - 1й из кэша вытолкнулся);
+		c := NewCache(2)
+
+		wasInCache := c.Set("a", 1)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("b", 2)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("c", 3)
+		require.False(t, wasInCache)
+
+		val, ok := c.Get("a")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("b")
+		require.True(t, ok)
+		require.Equal(t, 2, val)
+
+		val, ok = c.Get("c")
+		require.True(t, ok)
+		require.Equal(t, 3, val)
+
+		wasInCache = c.Set("d", 4)
+		require.False(t, wasInCache)
+
+		val, ok = c.Get("b")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("c")
+		require.True(t, ok)
+		require.Equal(t, 3, val)
+
+		val, ok = c.Get("d")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+
+		val, ok = c.Get("d")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+
+		val, ok = c.Get("d")
+		require.True(t, ok)
+		require.Equal(t, 4, val)
+
+		val, ok = c.Get("b")
+		require.False(t, ok)
+		require.Nil(t, val)
 	})
+
+	// t.Run("purge old elements", func(t *testing.T) {
+	// 	// Проверка на логику выталкивания давно используемых элементов (например: n = 3, добавили 3 элемента, обратились несколько раз
+	// 	// к разным элементам: изменили значение, получили значение и пр. - добавили 4й элемент, из первой тройки вытолкнется тот элемент,
+	// 	// что был затронут наиболее давно).
+	// 	c := NewCache(3)
+
+	// 	wasInCache := c.Set("a", 11)
+	// 	require.False(t, wasInCache)
+
+	// 	wasInCache = c.Set("b", 22)
+	// 	require.False(t, wasInCache)
+
+	// 	wasInCache = c.Set("c", 33)
+	// 	require.False(t, wasInCache)
+
+	// 	val, ok := c.Get("a")
+	// 	require.True(t, ok)
+	// 	require.Equal(t, 11, val)
+
+	// 	val, ok = c.Get("c")
+	// 	require.True(t, ok)
+	// 	require.Equal(t, 33, val)
+
+	// 	wasInCache = c.Set("a", 1)
+	// 	require.True(t, wasInCache)
+
+	// 	wasInCache = c.Set("b", 2)
+	// 	require.True(t, wasInCache)
+
+	// 	wasInCache = c.Set("f", 1234)
+	// 	require.False(t, wasInCache)
+
+	// 	val, ok = c.Get("c")
+	// 	require.False(t, ok)
+	// 	require.Nil(t, val)
+
+	// 	// wasInCache = c.Set("b", 55)
+	// 	// require.False(t, wasInCache)
+
+	// 	// val, ok = c.Get("q")
+	// 	// require.False(t, ok)
+	// 	// require.Nil(t, val)
+
+	// })
 }
 
 func TestCacheMultithreading(t *testing.T) {
