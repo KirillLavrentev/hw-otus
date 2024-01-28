@@ -74,6 +74,5 @@ func TestList(t *testing.T) {
 		require.Equal(t, 7, l.Len())
 		require.Equal(t, complex(2, 5), l.Front().Value)
 		require.Equal(t, -9, l.Back().Value)
-
 	})
 }
