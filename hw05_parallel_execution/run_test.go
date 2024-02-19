@@ -67,4 +67,75 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("len(tasks) less than n", func(t *testing.T) {
+		tasksCount := 5
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			err := fmt.Errorf("error from task %d", i)
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(100)))
+				atomic.AddInt32(&runTasksCount, 1)
+				return err
+			})
+		}
+
+		workersCount := 50
+		maxErrorsCount := 1
+
+		err := Run(tasks, workersCount, maxErrorsCount)
+
+		require.Truef(t, errors.Is(err, ErrErrorsLimitExceeded), "actual err - %v", err)
+		require.LessOrEqual(t, runTasksCount, int32(workersCount+maxErrorsCount), "extra tasks were started")
+	})
+
+	t.Run("Test case if m <= 0", func(t *testing.T) {
+		// m < 0
+		tasksCount := 100
+		workersCount := 10
+		maxErrorsCount := -10
+
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			err := fmt.Errorf("error from task %d", i)
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
+				atomic.AddInt32(&runTasksCount, 1)
+
+				return err
+			})
+		}
+
+		err := Run(tasks, workersCount, maxErrorsCount)
+
+		require.Nil(t, err, "expected nil")
+		require.LessOrEqual(t, runTasksCount, int32(tasksCount), "extra tasks were started")
+
+		//  m = 0
+		tasks = make([]Task, 0, tasksCount)
+
+		runTasksCount = 0
+
+		for i := 0; i < tasksCount; i++ {
+			err := fmt.Errorf("error from task %d", i)
+			tasks = append(tasks, func() error {
+				time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)))
+				atomic.AddInt32(&runTasksCount, 1)
+
+				return err
+			})
+		}
+
+		maxErrorsCount = 0
+		err = Run(tasks, workersCount, maxErrorsCount)
+
+		require.Nil(t, err, "expected nil")
+		require.LessOrEqual(t, runTasksCount, int32(tasksCount), "extra tasks were started")
+	})
 }
