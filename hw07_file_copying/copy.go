@@ -64,7 +64,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	} else {
 		_, err = io.CopyN(dst, reader, limit)
 	}
-	if errors.Is(err, io.EOF) && err != nil {
+	if !errors.Is(err, io.EOF) && err != nil {
 		return err
 	}
 
