@@ -87,7 +87,8 @@ func TestCopy(t *testing.T) {
 			if err != nil {
 				t.Fatal("Error in creation temp dir: ", err)
 			}
-			outPath := filepath.Join(tmpDir, "out_offset"+strconv.Itoa(int(tc.offset))+"_limit"+strconv.Itoa(int(tc.limit))+".txt")
+			outFile := "out_offset" + strconv.Itoa(int(tc.offset)) + "_limit" + strconv.Itoa(int(tc.limit)) + ".txt"
+			outPath := filepath.Join(tmpDir, outFile)
 			defer os.RemoveAll(tmpDir)
 
 			err = Copy(from, outPath, tc.offset, tc.limit)
