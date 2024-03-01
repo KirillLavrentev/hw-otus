@@ -1,6 +1,6 @@
 module github.com/KirillLavrentev/hw-otus/hw07_file_copying
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
